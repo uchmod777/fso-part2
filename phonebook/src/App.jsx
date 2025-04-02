@@ -1,16 +1,28 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
+import axios from 'axios'
 import ContactFilter from './components/ContactFilter'
 import ContactForm from './components/ContactForm'
 import ContactRenderer from './components/ContactRenderer'
 
 const App = () => {
   const [lastId, setLastId] = useState(0);
-  const [persons, setPersons] = useState([
-    { id: 0, name: 'Arto Hellas', number: '(320) 545-9087'}
-  ]);
+  const [persons, setPersons] = useState([]);
   const [newName, setNewName] = useState('');
   const [nameFilter, setNameFilter] = useState('');
   const [newNumber, setNewNumber] = useState('');
+
+  const hook = () => {
+    console.log('Loading data from http://localhost:3001/persons');
+    axios
+      .get('http://localhost:3001/persons')
+      .then((response) => {
+        console.log('Data loaded. Rerendering application');
+        setPersons(response.data);
+        setLastId(parseInt(response.data.slice(-1)[0].id) + 1);
+      });
+  }
+
+  useEffect(hook, []);
 
   const addPerson = (e) => {
     e.preventDefault();
@@ -27,7 +39,8 @@ const App = () => {
 
     const id = lastId + 1;
     const people = persons.concat({ id: id, name: newName, number: newNumber});
-    setLastId(id);
+
+    setLastId(id.toString());
     setPersons(people);
     setNewName('');
     setNewNumber('');

@@ -13,18 +13,16 @@ const App = () => {
   const [nameFilter, setNameFilter] = useState('');
   const [newNumber, setNewNumber] = useState('');
 
-  const hook = () => {
-    console.log('Loading data from http://localhost:3001/persons');
-    axios
-      .get('http://localhost:3001/persons')
-      .then((response) => {
-        console.log('Data loaded. Rerendering application');
-        setPersons(response.data);
-        setLastId(parseInt(response.data.slice(-1)[0].id));
+  const getPersons = () => {
+    contactService
+      .getContacts()
+      .then(returnedPersons => {
+        setPersons(returnedPersons);
+        setLastId(parseInt(returnedPersons.slice(-1)[0].id));
       });
   }
 
-  useEffect(hook, []);
+  useEffect(getPersons, []);
 
   const addPerson = (e) => {
     e.preventDefault();

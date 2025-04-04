@@ -51,6 +51,7 @@ const App = () => {
   }
 
   const deletePerson = (e) => {
+    window.confirm(`Delete ${e.target.name}`);
     contactService
       .deleteContact(e.target.id)
       .then(response => {

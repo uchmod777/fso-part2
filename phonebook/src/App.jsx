@@ -1,6 +1,5 @@
 import { useEffect, useState } from 'react';
 import contactService from './services/contacts';
-import axios from 'axios';
 import ContactFilter from './components/ContactFilter';
 import ContactForm from './components/ContactForm';
 import ContactRenderer from './components/ContactRenderer';
@@ -27,26 +26,42 @@ const App = () => {
   const addPerson = (e) => {
     e.preventDefault();
 
-    if (persons.find((person) => person.name === newName)) {
+    if (persons.find((person) => person.name === newName && person.number !== newNumber)) {
+      const match = persons.find((person) => person.name === newName && person.number !== newNumber)
+      window.confirm(`${match.name} is already added to the phonebook, update their number?`);
+      updatePhoneNumber(match);
+    }
+
+    else if (persons.find((person) => person.name === newName)) {
       alert(`${newName} is already added to the phonebook.`)
       return;
     }
 
-    if (persons.find((person) => person.number === newNumber)) {
+    else if (persons.find((person) => person.number === newNumber)) {
       alert(`${newNumber} is already assigned to another person in the phonebook`);
       return;
+    } else {
+      const id = (lastId + 1).toString();
+      const newPerson = { name: newName, number: newNumber, id: id };
+
+      contactService
+        .addContact(newPerson)
+        .then(returnedPerson => {
+          setPersons(persons.concat(returnedPerson));
+          setLastId(parseInt(returnedPerson.id));
+          setNewName('');
+          setNewNumber('');
+        });
     }
+  }
 
-    const id = (lastId + 1).toString();
-    const newPerson = { name: newName, number: newNumber, id: id };
-
+  const updatePhoneNumber = (person) => {
+    const newPerson = { ...person, number: newNumber };
+    console.log(newPerson);
     contactService
-      .addContact(newPerson)
-      .then(returnedPerson => {
-        setPersons(persons.concat(returnedPerson));
-        setLastId(parseInt(returnedPerson.id));
-        setNewName('');
-        setNewNumber('');
+      .updatePhoneNumber(newPerson.id, newPerson)
+      .then(_response => {
+        getPersons();
       });
   }
 
@@ -54,7 +69,7 @@ const App = () => {
     window.confirm(`Delete ${e.target.name}`);
     contactService
       .deleteContact(e.target.id)
-      .then(response => {
+      .then(_response => {
         getPersons();
       });
   }

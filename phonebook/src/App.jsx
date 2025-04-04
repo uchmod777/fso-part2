@@ -50,6 +50,14 @@ const App = () => {
       });
   }
 
+  const deletePerson = (e) => {
+    contactService
+      .deleteContact(e.target.id)
+      .then(response => {
+        getPersons();
+      });
+  }
+
   const handleOnNameFilterChange = (e) => {
     setNameFilter(e.target.value);
   }
@@ -69,7 +77,7 @@ const App = () => {
       <h3>Add a new contact</h3>
       <ContactForm addPerson={addPerson} newName={newName} handleOnNameChange={handleOnNameChange} newNumber={newNumber} handleOnNumberChange={handleOnNumberChange}/>
       <h3>Numbers</h3>
-      <ContactRenderer persons={persons} nameFilter={nameFilter} />
+      <ContactRenderer persons={persons} nameFilter={nameFilter} deletePerson={deletePerson} />
     </div>
   )
 }

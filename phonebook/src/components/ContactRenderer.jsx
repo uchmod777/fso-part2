@@ -1,4 +1,4 @@
-const ContactRenderer = ({ persons, nameFilter }) => {
+const ContactRenderer = ({ persons, nameFilter, deletePerson }) => {
     return (
         <>
         <ul>
@@ -11,6 +11,7 @@ const ContactRenderer = ({ persons, nameFilter }) => {
             return contacts.map((contact) => (
               <li key={contact.id}>
                 {contact.name} {' | '} {contact.number}
+                <button id={contact.id} type="button" onClick={deletePerson}>delete</button>
               </li>
             ));
           })()

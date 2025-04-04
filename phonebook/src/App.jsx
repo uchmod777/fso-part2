@@ -1,8 +1,10 @@
-import { useEffect, useState } from 'react'
-import axios from 'axios'
-import ContactFilter from './components/ContactFilter'
-import ContactForm from './components/ContactForm'
-import ContactRenderer from './components/ContactRenderer'
+import { useEffect, useState } from 'react';
+import contactService from './services/contacts';
+import axios from 'axios';
+import ContactFilter from './components/ContactFilter';
+import ContactForm from './components/ContactForm';
+import ContactRenderer from './components/ContactRenderer';
+
 
 const App = () => {
   const [lastId, setLastId] = useState(0);
@@ -18,7 +20,7 @@ const App = () => {
       .then((response) => {
         console.log('Data loaded. Rerendering application');
         setPersons(response.data);
-        setLastId(parseInt(response.data.slice(-1)[0].id) + 1);
+        setLastId(parseInt(response.data.slice(-1)[0].id));
       });
   }
 
@@ -37,13 +39,17 @@ const App = () => {
       return;
     }
 
-    const id = lastId + 1;
-    const people = persons.concat({ id: id, name: newName, number: newNumber});
+    const id = (lastId + 1).toString();
+    const newPerson = { name: newName, number: newNumber, id: id };
 
-    setLastId(id.toString());
-    setPersons(people);
-    setNewName('');
-    setNewNumber('');
+    contactService
+      .addContact(newPerson)
+      .then(returnedPerson => {
+        setPersons(persons.concat(returnedPerson));
+        setLastId(parseInt(returnedPerson.id));
+        setNewName('');
+        setNewNumber('');
+      });
   }
 
   const handleOnNameFilterChange = (e) => {
